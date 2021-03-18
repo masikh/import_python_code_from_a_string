@@ -18,9 +18,8 @@ class output:
 
 def importCode(code, name):
     """ code can be any object containing code -- string, file object, or
-       compiled code object. Returns a new module object initialized
-       by dynamically importing the given code and optionally adds it
-       to sys.modules under the given name.
+        compiled code object. Returns a new module object initialized
+        by dynamically importing the given code.
     """
     module = types.ModuleType(name)
     exec(code, module.__dict__)
@@ -34,28 +33,26 @@ class Bootstrap:
         self.run()
 
     def run(self):
-        module = importCode(self.code, 'Webshop')
-        module.Webshop(23, queue=self.queue)
+        module = importCode(self.code, 'POC')
+        module.POC('Hello World', queue=self.queue)
 
 
 if __name__ == '__main__':
     code = """
-class Webshop:
-    def __init__(self, a, queue=None):
-        self.a = a
+class POC:
+    def __init__(self, message, queue=None):
+        self.message = message
         self.queue = queue
         self.run()
 
     def run(self):
         while True:
             if not self.queue.empty():
-                print(self.queue.get())
+                print('{message} the time is {time} seconds past 1970'.format(message=self.message, time=self.queue.get()))
 """
     queue = mp.Queue()
     output(queue=queue)
-
-    # bootstrap = Bootstrap(code, queue=queue)
-
+    
     process = mp.Process(target=Bootstrap,
                          name='TEST',
                          args=(code,),
